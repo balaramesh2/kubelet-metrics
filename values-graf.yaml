@@ -1,0 +1,15 @@
+persistence:
+  accessModes:
+  - ReadWriteOnce
+  disableWarning: false
+  enabled: true
+  extraPvcLabels: {}
+  finalizers:
+  - kubernetes.io/pvc-protection
+  inMemory:
+    enabled: false
+  lookupVolumeName: true
+  size: 10Gi
+  type: pvc
+  volumeName: ""
+  storageClassName: "storageclass-wekafs-dir-api"
