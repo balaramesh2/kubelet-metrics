@@ -1,17 +1,41 @@
-# Monitoring per volume metrics with kubelet
+# Visualize WEKA Metrics with Prometheus and Grafana
 
-## Why monitor per volume stats from kubelet?
+## TLDR;
+```
+## Populate AWS and QUAY environment variables in init.sh
+sh init.sh
+```
 
-Since the `kubelet` is a component that runs on every Kubernetes node (worker and control plane), it makes it a great candidate to gather and expose node level metrics. This includes per volume metrics, provided:
+## Why Visualize WEKA Metrics?
 
-- The volume is a CSI volume (This did not work for Rancher `local-path` volumes in my testing)
-- The volume is attached to a node. When a volume is attached, mounted and being accessed, the `kubelet` process running locally on the node that it is mounted on can provide metrics.
+Kubernetes is a platform. Kubernetes administrators may only have visibility into workloads in Kubernetes! This makes it necessary for valuable storage-related metrics to be available in k8s.
 
-Both of these are requirements that can be satisfied out-of-the-box for PVCs provisioned using `csi.weka.io` as the provisioner.
+The WEKA Operator exposes useful metrics related to cluster health, filesystem usage information, CPU utilization, and more!
 
-## How does this work?
+This repo helps you kickstart your WEKA k8s visualization journey. 
 
-`kubelet` exposes several metrics by default. See https://kubernetes.io/docs/reference/instrumentation/metrics/ for reference.
-Most k8s distributions expose kubelet’s metrics by default.
+Use the `init.sh` script to:
+- deploy a k8s cluster in AWS.
+- deploy containerized WEKA running on the k8s cluster.
+- install Prometheus and Grafana. Pre-configure dashboards using `values-prom.yaml` and `values-graf.yaml`!
 
-You can confirm the metrics are accessible by deploying Prometheus and checking all available metrics. By default, a Prometheus installation will scrape Kubelet metrics.
+## How does it work?
+
+Newer releases of the WEKA operator [`v1.6.0` and above] deploy a node agent when the operator is installed. The node agent is capable of retrieving WEKA metrics from each node in a Kubernetes cluster. 
+
+These WEKA metrics can be scraped using Prometheus, and visualized using Grafana.
+
+Administrators can define dashboards as `json` manifests, promoting reusability.
+
+## Great! How do I begin?
+
+### Step 1: Clone repo
+```
+git clone <>
+```
+### Step 2: Update `init.sh`
+Provide your  variables (`AWS_*`, `QUAY_*`). Modify defaults if necessary.
+
+### Step 3: Run `init.sh`
+
+### Step 4: Access Grafana dashboard!
