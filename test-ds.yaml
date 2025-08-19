@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+  name: pvc-wekafs-dir-api-1
+  namespace: test
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+  storageClassName: storageclass-wekafs-dir-api
+  volumeMode: Filesystem
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+  labels:
+    app: csi-daemonset-app-on-dir-api
+  name: csi-wekafs-test-api-2
+  namespace: test
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      kubernetes.io/os: linux
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: csi-daemonset-app-on-dir-api
+        kubernetes.io/os: linux
+    spec:
+      containers:
+      - args:
+        - -c
+        - while true; do dd if=/dev/urandom of=/data/$(hostname)-random.img count=1024M
+          bs=3; sleep 30;rm -rf /data/*; done
+        command:
+        - /bin/sh
+        image: busybox
+        imagePullPolicy: Always
+        name: my-frontend
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /data
+          name: csi-wekafs-dir-api
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        topology.csi.weka.io/global: "true"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 1
+      volumes:
+      - name: csi-wekafs-dir-api
+        persistentVolumeClaim:
+          claimName: pvc-wekafs-dir-api-1
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate

@@ -1,3 +1,24 @@
+service:
+  enabled: true
+  type: NodePort
+  # Set the ip family policy to configure dual-stack see [Configure dual-stack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services)
+  ipFamilyPolicy: ""
+  # Sets the families that should be supported and the order in which they should be applied to ClusterIP as well. Can be IPv4 and/or IPv6.
+  ipFamilies: []
+  loadBalancerIP: ""
+  loadBalancerClass: ""
+  loadBalancerSourceRanges: []
+  port: 80
+  targetPort: 3000
+  nodePort: 31668
+    # targetPort: 4181 To be used with a proxy extraContainer
+  ## Service annotations. Can be templated.
+  annotations: {}
+  labels: {}
+  portName: service
+  # Adds the appProtocol field to the service. This allows to work with istio protocol selection. Ex: "http" or "tcp"
+  appProtocol: ""
+  sessionAffinity: ""
 dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1
@@ -10,6 +31,13 @@ dashboardProviders:
       editable: true
       options:
         path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
+    - name: 'weka-dashboards-kubernetes'
+      folder: 'Weka'
+      type: file
+      disableDeletion: true
+      editable: true
+      options:
+        path: /var/lib/grafana/dashbooards/weka-dashboards-kubernetes
 dashboards:
   grafana-dashboards-kubernetes:
     k8s-system-api-server:
@@ -29,6 +57,10 @@ dashboards:
       token: ''
     k8s-views-pods:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+      token: ''
+  weka-dashboards-kubernetes:
+    weka-control-tower:
+      file: weka-dashboard.json
       token: ''
 persistence:
   accessModes:
